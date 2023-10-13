@@ -567,6 +567,7 @@ export default class RadialLinearScale extends LinearScaleBase {
   drawGrid() {
     const ctx = this.ctx;
     const opts = this.options;
+    const tickOpts = opts.ticks;
     const {angleLines, grid, border} = opts;
     const labelCount = this._pointLabels.length;
 
@@ -578,14 +579,15 @@ export default class RadialLinearScale extends LinearScaleBase {
 
     if (grid.display) {
       this.ticks.forEach((tick, index) => {
-        if (index !== 0) {
-          offset = this.getDistanceFromCenterForValue(tick.value);
-          const context = this.getContext(index);
-          const optsAtIndex = grid.setContext(context);
-          const optsAtIndexBorder = border.setContext(context);
-
-          drawRadiusLine(this, optsAtIndex, offset, labelCount, optsAtIndexBorder);
+        if (index === 0 && tickOpts.autoSkip) {
+          return;
         }
+        offset = this.getDistanceFromCenterForValue(tick.value);
+        const context = this.getContext(index);
+        const optsAtIndex = grid.setContext(context);
+        const optsAtIndexBorder = border.setContext(context);
+
+        drawRadiusLine(this, optsAtIndex, offset, labelCount, optsAtIndexBorder);
       });
     }
 
@@ -645,7 +647,7 @@ export default class RadialLinearScale extends LinearScaleBase {
     ctx.textBaseline = 'middle';
 
     this.ticks.forEach((tick, index) => {
-      if (index === 0 && !opts.reverse) {
+      if (index === 0 && !opts.reverse && tickOpts.autoSkip) {
         return;
       }
 
